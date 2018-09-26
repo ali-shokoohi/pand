@@ -3,6 +3,7 @@
 
 from telegram.ext import Updater, MessageHandler, Filters, CommandHandler, CallbackQueryHandler
 from telegram import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
+from datetime import datetime
 import logging
 
 class User:
@@ -18,7 +19,7 @@ home_dir = '/home/pat/Desktop/projects/python/bots/pand/'
 log_location =  home_dir+'logs/bot.log'
 logging.basicConfig(filename=log_location ,format='%(asctime)s - %(name)s - %(message)s', level=logging.INFO)
 
-updater = Updater(token="628324666:AAHBU94JUKqBA-EsKxAyjaOmIkVq7DDZwQU")
+updater = Updater(token="643614521:AAEPZbI_2iF2O1I8RTvL7NTvQDZ56kEX4pA")
 dispatcher = updater.dispatcher
 
 def restart(user_data):
@@ -113,6 +114,10 @@ def callback(bot, update, user_data):
             if user_data['caption'] is not None:
                 text = user_data['caption'] + '\n' + text
             if user_data['author'] is not None:
+                date = str(datetime.now())[0: -7]
+                text = "*{0}*\n\n{1}\n\n_{2}_\n`{3}-{4}`".format(user_data['caption'], user_data['body'],
+                user_data['author'], user.id, date)
+                bot.send_message(chat_id="@PandCH", text=text, parse_mode="MARKDOWN")
                 answer = "ثبت شد!\nبعد از بازبینی، در کانال منتشر میشود."
         else:
             answer = "برای ثبت، وارد کردن متن اصلی الزامی میباشد."
