@@ -26,6 +26,7 @@ def restart(user_data):
         user_data['caption'] = None
         user_data['body'] = None
         user_data['author'] = None
+        user_data['text'] = None
         return(True)
     except:
         return(False)
@@ -43,7 +44,7 @@ def create(bot, update, user_data):
     erase = restart(user_data)
     user.id = update.message.from_user.id
     if (erase is True):
-        writer(bot, user.id, user_data, 'new')
+        writer(bot, user_data, 'new')
     else:
         bot.send_message(chat_id=user.id, text="Bad restart")
 
@@ -53,17 +54,20 @@ def get(bot, update, user_data):
     if user_data['caption'] is True:
         user_data['caption'] = msg
         answer = "عنوان متن تنظیم شد!"
+        writer(bot, user_data, 'edit')
     elif user_data['body'] is True:
         user_data['body'] = msg
         answer = "متن اصلی تنظیم شد!"
+        writer(bot, user_data, 'edit')
     elif user_data['author'] is True:
         user_data['author'] = msg
         answer = "نام صاحب سخن تنظیم شد!"
+        writer(bot, user_data, 'edit')
     else:
         answer = "برای ثبت پَند جدید از دستور زیر استفاده کنید:\n/new"
     bot.send_message(chat_id=user.id, text=answer)
 
-def writer(bot, to, user_data, method):
+def writer(bot, user_data, method):
     if user_data['caption'] is None:
 	       user_data['caption'] = "هنوز چیزی ثبت نشده!"
     if user_data['body'] is None:
@@ -81,10 +85,12 @@ def writer(bot, to, user_data, method):
     reply_markup = InlineKeyboardMarkup(button_list)
 
     if method == 'new':
-        bot.send_message(chat_id=to, text=message, reply_markup=reply_markup,
+        send_new = bot.send_message(chat_id=user.id, text=message, reply_markup=reply_markup,
         disable_web_page_preview=True)
+        user_data['text'] = send_new['message_id']
     elif method == 'edit':
-        pass
+        bot.edit_message_text(text=message, chat_id=user.id, message_id=user_data['text'],
+        reply_markup=reply_markup, disable_web_page_preview=True)
 
 def callback(bot, update, user_data):
     chat_id = update.callback_query.message.chat.id
@@ -107,8 +113,7 @@ def callback(bot, update, user_data):
             if user_data['caption'] is not None:
                 text = user_data['caption'] + '\n' + text
             if user_data['author'] is not None:
-                text = text + '\n' + user_data['author']
-            answer = "ثبت شد!\nبعد از بازبینی، در کانال منتشر میشود.\n"+text
+                answer = "ثبت شد!\nبعد از بازبینی، در کانال منتشر میشود."
         else:
             answer = "برای ثبت، وارد کردن متن اصلی الزامی میباشد."
     else:
